@@ -28,7 +28,6 @@ public class DataLoader implements CommandLineRunner {
                 .role(UserRole.ADMIN)
                 .build();
 
-        // Check if the user already exists to avoid duplicate entries
         if (userRepository.findByUsername(adminUser.getUsername()) == null) {
             userRepository.save(adminUser);
         }
