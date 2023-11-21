@@ -1,4 +1,4 @@
-package com.renee.PhotoBlog.service;
+package com.renee.PhotoBlog.config;
 
 import com.renee.PhotoBlog.model.User;
 import com.renee.PhotoBlog.repo.UserRepository;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetails implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
