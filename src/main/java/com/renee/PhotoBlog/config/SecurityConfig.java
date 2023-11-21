@@ -2,6 +2,7 @@ package com.renee.PhotoBlog.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,7 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/photos/**").authenticated()
+                .antMatchers(HttpMethod.GET, "/photos").permitAll()  // Allow GET requests to /photos without authentication
+                .antMatchers("/photos/**").authenticated()           // Other /photos/** endpoints require authentication
                 .anyRequest().permitAll()
                 .and()
                 .httpBasic();
