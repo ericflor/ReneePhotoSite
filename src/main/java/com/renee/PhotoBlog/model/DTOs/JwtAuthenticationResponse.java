@@ -9,7 +9,7 @@ public class JwtAuthenticationResponse {
         this.accessToken = accessToken;
     }
 
-    // Getters and setters
+
     public String getAccessToken() {
         return accessToken;
     }

@@ -4,13 +4,19 @@ public class UserRegistrationResponse {
 
     private String username;
     private String message;
+    private Long id;
 
-    public UserRegistrationResponse(String username, String message) {
+    public UserRegistrationResponse(Long id, String username, String message) {
+        this.id = id;
         this.username = username;
         this.message = message;
     }
 
-    // Getters and setters
+
+    public Long getId(){return id;}
+
+    public void setId(Long id) {this.id = id;}
+
     public String getUsername() {
         return username;
     }

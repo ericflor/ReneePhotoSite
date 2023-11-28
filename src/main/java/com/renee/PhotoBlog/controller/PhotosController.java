@@ -19,20 +19,16 @@ public class PhotosController {
         this.photosService = photosService;
     }
 
+
     @PostMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public Photo addPhotoForUser(@RequestBody Photo photo, @PathVariable Long userId) {
         return photosService.savePhotoForUser(photo, userId);
     }
 
-    @GetMapping("/user/{userId}")
-    public List<Photo> getPhotosByUserId(@PathVariable Long userId) {
-        return photosService.getPhotosByUserId(userId);
-    }
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Photo addContent(@RequestBody Photo photo) {
+    public Photo addPhoto(@RequestBody Photo photo) {
         return photosService.savePhoto(photo);
     }
 
@@ -49,6 +45,11 @@ public class PhotosController {
     @PreAuthorize("hasRole('ADMIN')")
     public void deletePhoto(@PathVariable Long id) {
         photosService.deletePhoto(id);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Photo> getPhotosByUserId(@PathVariable Long userId) {
+        return photosService.getPhotosByUserId(userId);
     }
 
     @GetMapping

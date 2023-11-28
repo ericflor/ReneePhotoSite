@@ -1,12 +1,19 @@
 package com.renee.PhotoBlog.model.DTOs;
 
+import com.renee.PhotoBlog.model.UserRole;
+
 public class UserRegistrationDto {
 
+    private Long id;
     private String username;
     private String password;
-    // Add other relevant fields
+    private UserRole role;
 
-    // Getters and setters
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
+
     public String getUsername() {
         return username;
     }
@@ -22,4 +29,8 @@ public class UserRegistrationDto {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public UserRole getRole() { return role; }
+
+    public void setRole(UserRole role) { this.role = role; }
 }
