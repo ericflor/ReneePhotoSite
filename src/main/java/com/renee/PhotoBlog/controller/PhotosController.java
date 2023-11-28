@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,36 @@ public class PhotosController {
         this.photosService = photosService;
     }
 
+
+
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Photo>> addMultiplePhotos(@RequestBody List<Photo> photos) {
+        List<Photo> savedPhotos = photosService.saveMultiplePhotos(photos);
+        return ResponseEntity.ok(savedPhotos);
+    }
+
+    @PostMapping("/bulk/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> addMultiplePhotosForUser(@RequestBody List<Photo> photos, @PathVariable Long userId) {
+        try {
+            List<Photo> savedPhotos = photosService.saveMultiplePhotosForUser(photos, userId);
+            return ResponseEntity.ok(savedPhotos);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
+    }
+
+    @PutMapping("/bulk/associate/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> associateMultiplePhotosToUser(@RequestBody List<Long> photoIds, @PathVariable Long userId) {
+        try {
+            List<Photo> updatedPhotos = photosService.associateMultiplePhotosToUser(photoIds, userId);
+            return ResponseEntity.ok(updatedPhotos);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
     @PostMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -75,4 +107,5 @@ public class PhotosController {
     public Optional<Photo> getPhotoById(@PathVariable Long id) {
         return photosService.getPhotoById(id);
     }
+
 }

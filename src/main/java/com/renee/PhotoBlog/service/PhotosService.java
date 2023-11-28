@@ -66,4 +66,26 @@ public class PhotosService {
         }
         photosRepository.deleteById(id);
     }
+
+    public List<Photo> saveMultiplePhotos(List<Photo> photos) {
+        return photosRepository.saveAll(photos);
+    }
+
+    public List<Photo> saveMultiplePhotosForUser(List<Photo> photos, Long userId) throws ResourceNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+
+        photos.forEach(photo -> photo.setUser(user));
+        return photosRepository.saveAll(photos);
+    }
+
+    public List<Photo> associateMultiplePhotosToUser(List<Long> photoIds, Long userId) throws ResourceNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+
+        List<Photo> photosToAssociate = photosRepository.findAllById(photoIds);
+        photosToAssociate.forEach(photo -> photo.setUser(user));
+
+        return photosRepository.saveAll(photosToAssociate);
+    }
 }
