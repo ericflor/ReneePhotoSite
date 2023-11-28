@@ -2,7 +2,9 @@ package com.renee.PhotoBlog.service;
 
 import com.renee.PhotoBlog.exception.ResourceNotFoundException;
 import com.renee.PhotoBlog.model.Photo;
+import com.renee.PhotoBlog.model.User;
 import com.renee.PhotoBlog.repo.PhotosRepository;
+import com.renee.PhotoBlog.repo.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,25 @@ import java.util.Optional;
 public class PhotosService {
 
     private final PhotosRepository photosRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PhotosService(PhotosRepository photosRepository) {
+    public PhotosService(PhotosRepository photosRepository, UserRepository userRepository) {
         this.photosRepository = photosRepository;
+        this.userRepository = userRepository;
+    }
+
+    public Photo savePhotoForUser(Photo photo, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+        photo.setUser(user);
+        return photosRepository.save(photo);
+    }
+
+    public List<Photo> getPhotosByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+        return photosRepository.findByUser(user);
     }
 
     public Photo savePhoto(Photo photo) {

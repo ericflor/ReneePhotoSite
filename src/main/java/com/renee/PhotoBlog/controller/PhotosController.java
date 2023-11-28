@@ -19,6 +19,17 @@ public class PhotosController {
         this.photosService = photosService;
     }
 
+    @PostMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Photo addPhotoForUser(@RequestBody Photo photo, @PathVariable Long userId) {
+        return photosService.savePhotoForUser(photo, userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Photo> getPhotosByUserId(@PathVariable Long userId) {
+        return photosService.getPhotosByUserId(userId);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public Photo addContent(@RequestBody Photo photo) {

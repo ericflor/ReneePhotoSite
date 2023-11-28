@@ -1,4 +1,4 @@
-package com.renee.PhotoBlog.config;
+package com.renee.PhotoBlog.security;
 
 import com.renee.PhotoBlog.model.User;
 import com.renee.PhotoBlog.model.UserRole;

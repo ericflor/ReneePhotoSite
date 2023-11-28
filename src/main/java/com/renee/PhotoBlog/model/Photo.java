@@ -1,5 +1,6 @@
 package com.renee.PhotoBlog.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -7,11 +8,10 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@ToString
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Table(name = "photos")
-@NoArgsConstructor
 public class Photo {
 
     @Id
@@ -25,4 +25,9 @@ public class Photo {
 
     @Lob
     private byte[] photo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user; // Linking back to the user
 }

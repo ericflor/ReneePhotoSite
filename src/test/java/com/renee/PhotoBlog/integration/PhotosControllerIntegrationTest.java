@@ -2,7 +2,10 @@ package com.renee.PhotoBlog.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.renee.PhotoBlog.model.Photo;
+import com.renee.PhotoBlog.model.User;
+import com.renee.PhotoBlog.model.UserRole;
 import com.renee.PhotoBlog.repo.PhotosRepository;
+import com.renee.PhotoBlog.repo.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,23 +35,57 @@ public class PhotosControllerIntegrationTest {
     private PhotosRepository photosRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    private User testUser;
 
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         photosRepository.deleteAll();
+        userRepository.deleteAll();
+        testUser = createUser();
+    }
+
+    private User createUser() {
+        User user = new User(null, "testuser", "password", UserRole.USER, null);
+        return userRepository.save(user);
     }
 
     private Photo createTestPhoto() {
-        Photo photo = new Photo(null, "Test Title", "2023-01-01", "Test Description", "Test Location", null);
+        Photo photo = new Photo(null, "Test Title", "2023-01-01", "Test Description", "Test Location", null, testUser);
         return photosRepository.save(photo);
+    }
+
+    // Test methods
+
+    @Test
+    @WithMockUser(username = "testuser", roles = {"ADMIN"})
+    public void testAddPhotoForUser() throws Exception {
+        Photo newPhoto = new Photo(null, "Test Title", "2023-01-01", "Test Description", "Test Location", null, testUser);
+        mockMvc.perform(post("/photos/user/" + testUser.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newPhoto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Test Title"));
+    }
+
+    @Test
+    public void testGetPhotosByUserId() throws Exception {
+        Photo existingPhoto = createTestPhoto();
+
+        mockMvc.perform(get("/photos/user/" + testUser.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(existingPhoto.getId()));
     }
 
     @Test
     @WithMockUser(username = "ReneeMichael", roles = {"ADMIN"})
     public void testAddPhotoAsAdmin() throws Exception {
-        Photo newPhoto = new Photo(null, "Test Title", "2023-01-01", "Test Description", "Test Location", null);
+        Photo newPhoto = new Photo(null, "Test Title", "2023-01-01", "Test Description", "Test Location", null, testUser);
         mockMvc.perform(post("/photos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newPhoto)))
@@ -94,5 +131,4 @@ public class PhotosControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(existingPhoto.getId()));
     }
-
 }
