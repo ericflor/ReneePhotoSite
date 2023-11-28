@@ -31,6 +31,16 @@ public class PhotosService {
         return photosRepository.save(photo);
     }
 
+    public Photo associatePhotoToUser(Long photoId, Long userId) throws ResourceNotFoundException {
+        Photo photo = photosRepository.findById(photoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Photo with ID " + photoId + " not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
+
+        photo.setUser(user);
+        return photosRepository.save(photo);
+    }
+
     public List<Photo> getPhotosByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));

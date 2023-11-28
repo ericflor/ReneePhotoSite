@@ -1,8 +1,11 @@
 package com.renee.PhotoBlog.controller;
 
+import com.renee.PhotoBlog.exception.ResourceNotFoundException;
 import com.renee.PhotoBlog.model.Photo;
 import com.renee.PhotoBlog.service.PhotosService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -24,6 +27,17 @@ public class PhotosController {
     @PreAuthorize("hasRole('ADMIN')")
     public Photo addPhotoForUser(@RequestBody Photo photo, @PathVariable Long userId) {
         return photosService.savePhotoForUser(photo, userId);
+    }
+
+    @PutMapping("/associate/{photoId}/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> associatePhotoToUser(@PathVariable Long photoId, @PathVariable Long userId) {
+        try {
+            Photo updatedPhoto = photosService.associatePhotoToUser(photoId, userId);
+            return ResponseEntity.ok(updatedPhoto);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping
