@@ -20,7 +20,7 @@ public class UserService {
 
     public User registerNewUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(UserRole.USER); // Set the role to USER
+        user.setRole(UserRole.USER);
         return userRepository.save(user);
     }
 
