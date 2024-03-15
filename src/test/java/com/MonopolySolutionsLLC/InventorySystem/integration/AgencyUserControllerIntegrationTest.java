@@ -72,6 +72,31 @@ public class AgencyUserControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testAddAgencyAsRetailer() throws Exception {
+        // Mimic JSON structure as it would be received from the UI, including the level as a string
+        String newAgencyJson = """
+        {
+          "name": "Retail Agency",
+          "email": "retailagency@email.com",
+          "username": "retailagency",
+          "password": "password",
+          "level": "RETAILER"
+        }
+    """;
+
+        mockMvc.perform(post("/agencies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newAgencyJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Retail Agency"))
+                .andExpect(jsonPath("$.email").value("retailagency@email.com"))
+                .andExpect(jsonPath("$.username").value("retailagency"))
+                .andExpect(jsonPath("$.level").value("RETAILER"))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testGetAgencies() throws Exception {
         mockMvc.perform(get("/agencies"))
                 .andExpect(status().isOk());
@@ -131,7 +156,7 @@ public class AgencyUserControllerIntegrationTest {
     public void testFindUserById() throws Exception {
         Agency newUser = new Agency(2L, "ADMIN","admin@email.com",
                 "authUser", "password",
-                AgencyLevel.EMPLOYEE, UserRole.ADMIN);
+                AgencyLevel.RETAILER, UserRole.ADMIN);
         Agency savedUser = agencyRepository.save(newUser);
 
         mockMvc.perform(get("/agencies/" + savedUser.getId()))
@@ -139,7 +164,7 @@ public class AgencyUserControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.name").value("ADMIN"))
                 .andExpect(jsonPath("$.username").value("authUser"))
-                .andExpect(jsonPath("$.level").value("EMPLOYEE"));
+                .andExpect(jsonPath("$.level").value("RETAILER"));
     }
 
     @Test

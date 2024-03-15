@@ -27,6 +27,9 @@ public class AgencyService {
         if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
             // If true, set the role of the agency to EMPLOYEE
             agency.setRole(UserRole.EMPLOYEE);
+            // Else, set the role of the agency to ADMIN
+        } else {
+            agency.setRole(UserRole.ADMIN);
         }
 
         Agency existingAgency = agencyRepository.findByUsername(agency.getUsername());
