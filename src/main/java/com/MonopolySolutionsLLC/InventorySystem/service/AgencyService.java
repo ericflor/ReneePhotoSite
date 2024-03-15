@@ -54,13 +54,30 @@ public class AgencyService {
 
     public Agency updateAgency(Long id, Agency agencyDetails) throws ResourceNotFoundException {
         Agency agency = getAgencyById(id);
-        agency.setName(agencyDetails.getName());
-        agency.setEmail(agencyDetails.getEmail());
-        agency.setUsername(agencyDetails.getUsername());
-        agency.setPassword(agencyDetails.getPassword());
-        agency.setLevel(agencyDetails.getLevel());
-        return saveAgency(agency);
+
+        if (agencyDetails.getName() != null) agency.setName(agencyDetails.getName());
+        if (agencyDetails.getEmail() != null) agency.setEmail(agencyDetails.getEmail());
+        if (agencyDetails.getUsername() != null) agency.setUsername(agencyDetails.getUsername());
+        if (agencyDetails.getLevel() != null) agency.setLevel(agencyDetails.getLevel());
+        if (agencyDetails.getBlocked() != null) {
+            agency.setBlocked(agencyDetails.getBlocked());
+
+            if (Boolean.TRUE.equals(agencyDetails.getBlocked())) {
+                agency.setRole(UserRole.EMPLOYEE);
+            } else {
+                agency.setRole(UserRole.ADMIN);
+            }
+        }
+
+        Agency existingAgency = agencyRepository.findByUsername(agency.getUsername());
+
+        if (existingAgency != null) {
+            throw new RuntimeException("The username: " + agency.getUsername() + " already exists.");
+        }
+
+        return agencyRepository.save(agency);
     }
+
 
     public void deleteAgency(Long id) {
         agencyRepository.deleteById(id);

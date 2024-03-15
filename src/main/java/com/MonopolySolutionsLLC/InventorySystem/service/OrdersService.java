@@ -41,6 +41,28 @@ public class OrdersService {
         ordersRepository.deleteById(id);
     }
 
+    public Order updateOrder(Long id, Order orderDetails) {
+        Order order = ordersRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with ID " + id + " not found"));
+
+        // Only update fields that are present in the request
+        if (orderDetails.getCompanyName() != null) order.setCompanyName(orderDetails.getCompanyName());
+        if (orderDetails.getNameOfRecipient() != null) order.setNameOfRecipient(orderDetails.getNameOfRecipient());
+        if (orderDetails.getPhoneNumber() != null) order.setPhoneNumber(orderDetails.getPhoneNumber());
+        if (orderDetails.getEmail() != null) order.setEmail(orderDetails.getEmail());
+        if (orderDetails.getAddress() != null) order.setAddress(orderDetails.getAddress());
+        if (orderDetails.getCity() != null) order.setCity(orderDetails.getCity());
+        if (orderDetails.getState() != null) order.setState(orderDetails.getState());
+        if (orderDetails.getZipCode() != null) order.setZipCode(orderDetails.getZipCode());
+        if (orderDetails.getNameETC() != null) order.setNameETC(orderDetails.getNameETC());
+        if (orderDetails.getQuantity() != null) order.setQuantity(orderDetails.getQuantity());
+        if (orderDetails.getNotes() != null) order.setNotes(orderDetails.getNotes());
+        if (orderDetails.getTrackingNumber() != null) order.setTrackingNumber(orderDetails.getTrackingNumber());
+        if (orderDetails.getStatus() != null) order.setStatus(orderDetails.getStatus());
+
+        return ordersRepository.save(order);
+    }
+
     public List<Order> saveMultipleOrders(List<Order> orders) {
         return ordersRepository.saveAll(orders);
     }

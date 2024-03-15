@@ -1,5 +1,6 @@
 package com.MonopolySolutionsLLC.InventorySystem.controller;
 
+import com.MonopolySolutionsLLC.InventorySystem.exception.ResourceNotFoundException;
 import com.MonopolySolutionsLLC.InventorySystem.model.Order;
 import com.MonopolySolutionsLLC.InventorySystem.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,15 @@ public class OrdersController {
         return ordersService.saveOrder(order);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Order updateOrder(@PathVariable Long id, @RequestBody Order order) {
-        if (!order.getId().equals(id)) {
-            throw new IllegalArgumentException("Order ID doesn't match URL ID");
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
+        try {
+            Order updatedOrder = ordersService.updateOrder(id, orderDetails);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ordersService.saveOrder(order);
     }
 
     @DeleteMapping("/{id}")

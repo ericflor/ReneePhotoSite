@@ -156,7 +156,7 @@ public class AgencyUserControllerIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testFindUserById() throws Exception {
         Agency newUser = new Agency(2L, "ADMIN","admin@email.com",
-                "authUser", "password",
+                "authUser", "password", false,
                 AgencyLevel.RETAILER, UserRole.ADMIN);
         Agency savedUser = agencyRepository.save(newUser);
 
@@ -170,13 +170,14 @@ public class AgencyUserControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    public void testUpdateAgency() throws Exception {
+    public void testUpdateAgencyBlocked() throws Exception {
 
         Agency originalAgency = new Agency();
         originalAgency.setName("Original Name");
         originalAgency.setEmail("original@email.com");
         originalAgency.setUsername("originalUsername");
         originalAgency.setPassword(passwordEncoder.encode("originalPassword"));
+        originalAgency.setBlocked(false);
         originalAgency.setLevel(AgencyLevel.DISTRIBUTOR);
         Agency savedAgency = agencyRepository.save(originalAgency);
 
@@ -184,10 +185,10 @@ public class AgencyUserControllerIntegrationTest {
         updatedDetails.setName("Updated Name");
         updatedDetails.setEmail("updated@email.com");
         updatedDetails.setUsername("updatedUsername");
-        updatedDetails.setPassword("updatedPassword"); // The password should be sent plain here and encoded in the service
+        updatedDetails.setBlocked(true);
         updatedDetails.setLevel(AgencyLevel.MASTER_AGENT);
 
-        mockMvc.perform(put("/agencies/" + savedAgency.getId())
+        mockMvc.perform(patch("/agencies/" + savedAgency.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedDetails)))
                 .andExpect(status().isOk())
@@ -202,6 +203,8 @@ public class AgencyUserControllerIntegrationTest {
         assertEquals("Updated Name", updatedAgency.getName());
         assertEquals("updated@email.com", updatedAgency.getEmail());
         assertEquals("updatedUsername", updatedAgency.getUsername());
+        assertEquals(true, updatedAgency.getBlocked());
+        assertEquals("EMPLOYEE", updatedAgency.getRole().toString());
     }
 
     @Test
@@ -228,16 +231,18 @@ public class AgencyUserControllerIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testUpdateAgencyWithExistingUsername() throws Exception {
         // Create two agencies
-        Agency firstAgency = new Agency(null, "First Agency", "first@agency.com", "firstUsername", passwordEncoder.encode("password"), AgencyLevel.RETAILER, null);
-        Agency secondAgency = new Agency(null, "Second Agency", "second@agency.com", "secondUsername", passwordEncoder.encode("password"), AgencyLevel.RETAILER, null);
+        Agency firstAgency = new Agency(null, "First Agency", "first@agency.com", "firstUsername", passwordEncoder.encode("password"), false, AgencyLevel.RETAILER, UserRole.ADMIN);
+        Agency secondAgency = new Agency(null, "Second Agency", "second@agency.com", "secondUsername", passwordEncoder.encode("password"), false, AgencyLevel.RETAILER, UserRole.ADMIN);
         agencyRepository.save(firstAgency);
         Agency savedSecondAgency = agencyRepository.save(secondAgency);
 
+        // Create a JSON object with only the username field to mimic a PATCH operation
+        String jsonPatch = "{\"username\":\"firstUsername\"}";
+
         // Attempt to update the second agency with the username of the first
-        secondAgency.setUsername("firstUsername"); // Setting username of the first agency
-        mockMvc.perform(put("/agencies/" + savedSecondAgency.getId())
+        mockMvc.perform(patch("/agencies/" + savedSecondAgency.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(secondAgency)))
+                        .content(jsonPatch))
                 .andExpect(status().is5xxServerError())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof RuntimeException))
                 .andExpect(result -> assertEquals("The username: firstUsername already exists.", result.getResolvedException().getMessage()));
@@ -266,7 +271,7 @@ public class AgencyUserControllerIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testDeleteAgency() throws Exception {
         // Create and save an agency
-        Agency newAgency = new Agency(null, "Test Agency", "test@agency.com", "testAgency", passwordEncoder.encode("password"), AgencyLevel.DISTRIBUTOR, UserRole.ADMIN);
+        Agency newAgency = new Agency(null, "Test Agency", "test@agency.com", "testAgency", passwordEncoder.encode("password"), true, AgencyLevel.DISTRIBUTOR, UserRole.ADMIN);
         Agency savedAgency = agencyRepository.save(newAgency);
 
         // Delete the agency
@@ -300,7 +305,7 @@ public class AgencyUserControllerIntegrationTest {
     """;
 
         // Attempt to update a non-existent agency
-        mockMvc.perform(put("/agencies/999999") // Assuming this ID does not exist
+        mockMvc.perform(patch("/agencies/999999") // Assuming this ID does not exist
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedAgencyJson))
                 .andExpect(status().isNotFound());

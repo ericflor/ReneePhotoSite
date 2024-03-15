@@ -55,20 +55,8 @@ public class InventoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Phone> updatePhone(@PathVariable String imei, @RequestBody Phone phoneDetails) {
         try {
-            Phone existingPhone = inventoryService.getPhoneByImei(imei)
-                    .orElseThrow(() -> new ResourceNotFoundException("Phone not found for this imei: " + imei));
-
-            if (phoneDetails.getStatus() != null) existingPhone.setStatus(phoneDetails.getStatus());
-            if (phoneDetails.getType() != null) existingPhone.setType(phoneDetails.getType());
-            if (phoneDetails.getModel() != null) existingPhone.setModel(phoneDetails.getModel());
-            if (phoneDetails.getMasterAgent() != null) existingPhone.setMasterAgent(phoneDetails.getMasterAgent());
-            if (phoneDetails.getDistributor() != null) existingPhone.setDistributor(phoneDetails.getDistributor());
-            if (phoneDetails.getRetailer() != null) existingPhone.setRetailer(phoneDetails.getRetailer());
-            if (phoneDetails.getDate() != null) existingPhone.setDate(phoneDetails.getDate());
-
-            Phone updatedPhone = inventoryService.savePhone(existingPhone);
+            Phone updatedPhone = inventoryService.updatePhone(imei, phoneDetails);
             return ResponseEntity.ok(updatedPhone);
-
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

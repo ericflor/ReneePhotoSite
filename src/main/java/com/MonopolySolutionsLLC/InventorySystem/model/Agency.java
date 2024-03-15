@@ -23,6 +23,7 @@ public class Agency {
     private String email;
     private String username;
     private String password;
+    private Boolean blocked;
 
     @Enumerated(EnumType.STRING)
     private AgencyLevel level;
