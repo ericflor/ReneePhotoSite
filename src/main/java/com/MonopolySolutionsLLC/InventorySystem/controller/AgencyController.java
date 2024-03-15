@@ -2,12 +2,14 @@ package com.MonopolySolutionsLLC.InventorySystem.controller;
 
 import com.MonopolySolutionsLLC.InventorySystem.exception.ResourceNotFoundException;
 import com.MonopolySolutionsLLC.InventorySystem.model.Agency;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.AgencyLevel;
 import com.MonopolySolutionsLLC.InventorySystem.service.AgencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -20,10 +22,18 @@ public class AgencyController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Agency> createAgency(@RequestBody Agency agency) {
+    public ResponseEntity<?> createAgency(@RequestBody Agency agency) {
 
         if (agency.getLevel() == null) {
-            return ResponseEntity.badRequest().body(agency);
+            return ResponseEntity.badRequest().body("Error: Level is required.");
+        }
+
+        // Check if the provided level string matches any AgencyLevel enum, case-insensitively
+        boolean levelExists = Arrays.stream(AgencyLevel.values())
+                .anyMatch(e -> e.name().equalsIgnoreCase(agency.getLevel().name()));
+
+        if (!levelExists) {
+            return ResponseEntity.badRequest().body("Error: Invalid level value.");
         }
 
         return ResponseEntity.ok(agencyService.saveAgency(agency));

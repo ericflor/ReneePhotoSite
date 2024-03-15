@@ -23,6 +23,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -201,5 +202,107 @@ public class AgencyUserControllerIntegrationTest {
         assertEquals("Updated Name", updatedAgency.getName());
         assertEquals("updated@email.com", updatedAgency.getEmail());
         assertEquals("updatedUsername", updatedAgency.getUsername());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testAddAgencyWithInvalidLevel() throws Exception {
+        String newAgencyJson = """
+        {
+            "name": "Invalid Level Agency",
+            "email": "invalidlevel@agency.com",
+            "username": "invalidlevel",
+            "password": "password",
+            "level": "INVALID_LEVEL"
+        }
+    """;
+
+        mockMvc.perform(post("/agencies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newAgencyJson))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testUpdateAgencyWithExistingUsername() throws Exception {
+        // Create two agencies
+        Agency firstAgency = new Agency(null, "First Agency", "first@agency.com", "firstUsername", passwordEncoder.encode("password"), AgencyLevel.RETAILER, null);
+        Agency secondAgency = new Agency(null, "Second Agency", "second@agency.com", "secondUsername", passwordEncoder.encode("password"), AgencyLevel.RETAILER, null);
+        agencyRepository.save(firstAgency);
+        Agency savedSecondAgency = agencyRepository.save(secondAgency);
+
+        // Attempt to update the second agency with the username of the first
+        secondAgency.setUsername("firstUsername"); // Setting username of the first agency
+        mockMvc.perform(put("/agencies/" + savedSecondAgency.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(secondAgency)))
+                .andExpect(status().is5xxServerError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof RuntimeException))
+                .andExpect(result -> assertEquals("The username: firstUsername already exists.", result.getResolvedException().getMessage()));
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = {"EMPLOYEE"})
+    public void testCreateAgencyWithoutAdminRole() throws Exception {
+        String newAgencyJson = """
+        {
+            "name": "Unauthorized Agency",
+            "email": "unauth@agency.com",
+            "username": "unauthUsername",
+            "password": "password",
+            "level": "RETAILER"
+        }
+    """;
+
+        mockMvc.perform(post("/agencies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newAgencyJson))
+                .andExpect(status().isForbidden()); // Expecting 403 Forbidden response
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testDeleteAgency() throws Exception {
+        // Create and save an agency
+        Agency newAgency = new Agency(null, "Test Agency", "test@agency.com", "testAgency", passwordEncoder.encode("password"), AgencyLevel.DISTRIBUTOR, UserRole.ADMIN);
+        Agency savedAgency = agencyRepository.save(newAgency);
+
+        // Delete the agency
+        mockMvc.perform(delete("/agencies/" + savedAgency.getId()))
+                .andExpect(status().isOk());
+
+        // Attempt to get the deleted agency
+        mockMvc.perform(get("/agencies/" + savedAgency.getId()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testDeleteNonExistentAgency() throws Exception {
+        // Attempt to delete a non-existent agency
+        mockMvc.perform(delete("/agencies/999999")) // Assuming this ID does not exist
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testUpdateNonExistentAgency() throws Exception {
+        String updatedAgencyJson = """
+    {
+        "name": "Updated Name",
+        "email": "updated@agency.com",
+        "username": "updatedAgency",
+        "password": "updatedPassword",
+        "level": "MASTER_AGENT"
+    }
+    """;
+
+        // Attempt to update a non-existent agency
+        mockMvc.perform(put("/agencies/999999") // Assuming this ID does not exist
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedAgencyJson))
+                .andExpect(status().isNotFound());
     }
 }
