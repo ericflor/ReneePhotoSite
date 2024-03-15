@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class InventoryService {
         return inventoryRepository.findByImei(imei);
     }
 
+    @Transactional
     public void deletePhone(String imei) {
         inventoryRepository.deleteByImei(imei);
     }
@@ -51,8 +53,10 @@ public class InventoryService {
         if (phoneDetails.getRetailer() != null) phone.setRetailer(phoneDetails.getRetailer());
         if (phoneDetails.getDate() != null) phone.setDate(phoneDetails.getDate());
 
+        // NEED TO MAKE SURE TO PASS EXISTING EMPLOYEE ID THAT WE WANT TO TRANSFER THE PHONE TO!!!!!!!
+
+        if (phoneDetails.getEmployee() != null) phone.setEmployee(phoneDetails.getEmployee());
+
         return inventoryRepository.save(phone);
     }
-
-
 }
