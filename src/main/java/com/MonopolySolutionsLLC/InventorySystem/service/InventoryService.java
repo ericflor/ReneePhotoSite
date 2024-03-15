@@ -4,6 +4,8 @@ import com.MonopolySolutionsLLC.InventorySystem.model.Phone;
 import com.MonopolySolutionsLLC.InventorySystem.repo.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,8 @@ public class InventoryService {
         return  inventoryRepository.saveAll(phones);
     }
 
-    public List<Phone> getAllPhones() {
-        return inventoryRepository.findAll();
+    public Page<Phone> getAllPhones(Pageable pageable) {
+        return inventoryRepository.findAll(pageable);
     }
 
     public Optional<Phone> getPhoneByImei(String imei) {

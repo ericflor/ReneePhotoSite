@@ -7,6 +7,8 @@ import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -41,8 +43,8 @@ public class AgencyService {
         return agencyRepository.save(agency);
     }
 
-    public List<Agency> getAllAgencies() {
-        return agencyRepository.findAll();
+    public Page<Agency> getAllAgencies(Pageable pageable) {
+        return agencyRepository.findAll(pageable);
     }
 
     public Agency getAgencyById(Long id) throws ResourceNotFoundException {

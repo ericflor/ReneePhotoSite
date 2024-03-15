@@ -6,6 +6,8 @@ import com.MonopolySolutionsLLC.InventorySystem.repo.OrdersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +25,8 @@ public class OrdersService {
         return ordersRepository.save(order);
     }
 
-    public List<Order> getAllOrders() {
-        return ordersRepository.findAll();
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return ordersRepository.findAll(pageable);
     }
 
     public Optional<Order> getOrderById(Long id) {
