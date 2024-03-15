@@ -310,4 +310,40 @@ public class AgencyUserControllerIntegrationTest {
                         .content(updatedAgencyJson))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetAllAgenciesPaginated() throws Exception {
+        // Given multiple agencies are saved in the database
+        agencyRepository.save(new Agency(null, "Agency One", "agencyone@example.com", "agencyone", "pass1", false, AgencyLevel.DISTRIBUTOR, UserRole.ADMIN));
+        agencyRepository.save(new Agency(null, "Agency Two", "agencytwo@example.com", "agencytwo", "pass2", false, AgencyLevel.RETAILER, UserRole.ADMIN));
+
+        // When GET request is made to fetch all agencies with pagination
+        mockMvc.perform(get("/agencies?page=0&size=2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // Then a page of agencies is returned successfully
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").isNumber())
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.totalElements").isNumber());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetAgencyById() throws Exception {
+        // Given an agency is saved in the database
+        Agency savedAgency = agencyRepository.save(new Agency(null, "Specific Agency", "specific@example.com", "specificagency", "pass3", false, AgencyLevel.EMPLOYEE, UserRole.EMPLOYEE));
+
+        // When GET request is made to fetch agency by ID
+        mockMvc.perform(get("/agencies/" + savedAgency.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                // Then the specific agency's details are returned successfully
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedAgency.getId()))
+                .andExpect(jsonPath("$.name").value("Specific Agency"))
+                .andExpect(jsonPath("$.email").value("specific@example.com"))
+                .andExpect(jsonPath("$.username").value("specificagency"));
+    }
+
 }

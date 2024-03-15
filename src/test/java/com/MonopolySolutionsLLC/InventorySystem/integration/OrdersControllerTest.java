@@ -185,4 +185,82 @@ public class OrdersControllerTest {
                 .andExpect(jsonPath("$.[0].companyName").value("Bulk Company 1"))
                 .andExpect(jsonPath("$.[1].companyName").value("Bulk Company 2"));
     }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testUpdateOrderToShipped() throws Exception {
+        // Create an order
+        Order order = new Order(null, "Company Name", "John Doe", "123456789", "john.doe@example.com", "123 Main St", "City", "State", "12345", null, 10, null, null, Status.APPROVED);
+        Order savedOrder = ordersRepository.save(order);
+
+        // Update the order status to SHIPPED
+        mockMvc.perform(patch("/orders/" + savedOrder.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"SHIPPED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(Status.SHIPPED.name()));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testUpdateOrderToDenied() throws Exception {
+        // Create an order
+        Order order = new Order(null, "Company Name", "Jane Doe", "987654321", "jane.doe@example.com", "456 Another St", "Another City", "Another State", "54321", null, 5, null, null, Status.NEW);
+        Order savedOrder = ordersRepository.save(order);
+
+        // Update the order status to DENIED
+        mockMvc.perform(patch("/orders/" + savedOrder.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"DENIED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(Status.DENIED.name()));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetOrderByIdSuccess() throws Exception {
+        // Create and save an order
+        Order newOrder = new Order(null, "Test Company", "John Smith", "555-555-5555", "john@test.com", "123 Test Ave", "Test City", "TS", "12345", "Test Order", 1, "No notes", null, Status.NEW);
+        Order savedOrder = ordersRepository.save(newOrder);
+
+        // Perform the GET request
+        mockMvc.perform(get("/orders/" + savedOrder.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedOrder.getId()))
+                .andExpect(jsonPath("$.companyName").value("Test Company"))
+                .andExpect(jsonPath("$.status").value(Status.NEW.toString()));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetAllOrdersPaginated() throws Exception {
+        // Assume orders have been added to the database in the setup
+
+        // Perform the GET request for the first page with a specific page size
+        mockMvc.perform(get("/orders").param("page", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").isNumber())
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalElements").isNumber())
+                .andExpect(jsonPath("$.totalPages").isNumber());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetNonExistentOrderById() throws Exception {
+        // Attempt to fetch an order that does not exist
+        mockMvc.perform(get("/orders/9999999999")) // Using an ID that is unlikely to exist
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetOrdersPaginatedEmptyResult() throws Exception {
+        // Fetching a page that doesn't exist (assuming a clean database or a very high page number)
+        mockMvc.perform(get("/orders").param("page", "100").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
 }

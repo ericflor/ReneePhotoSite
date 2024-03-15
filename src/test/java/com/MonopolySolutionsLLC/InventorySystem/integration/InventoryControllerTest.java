@@ -155,6 +155,7 @@ public class InventoryControllerTest {
         assertFalse(foundPhone.isPresent());
     }
 
+    @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testUpdatePhoneModel() throws Exception {
         Agency employee = createTestAgency();
@@ -204,5 +205,42 @@ public class InventoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].imei").value("111111111111111"))
                 .andExpect(jsonPath("$.[1].imei").value("222222222222222"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetPhoneByImei() throws Exception {
+        // Given a phone is saved in the database
+        Agency employee = createTestAgency();
+        Phone phone = new Phone("333333333333333", "Available", "Smartphone", "Model C", "MasterAgentC", "DistributorC", "RetailerC", new Date(), employee);
+        inventoryRepository.save(phone);
+
+        // When GET request is made to fetch phone by IMEI
+        mockMvc.perform(get("/inventory/" + phone.getImei())
+                        .contentType(MediaType.APPLICATION_JSON))
+                // Then the phone details are returned successfully
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.imei").value(phone.getImei()))
+                .andExpect(jsonPath("$.status").value("Available"))
+                .andExpect(jsonPath("$.model").value("Model C"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    public void testGetAllPhonesPaginated() throws Exception {
+        // Given multiple phones are saved in the database
+        Agency employee = createTestAgency();
+        inventoryRepository.save(new Phone("444444444444444", "Available", "Smartphone", "Model D", "MasterAgentD", "DistributorD", "RetailerD", new Date(), employee));
+        inventoryRepository.save(new Phone("555555555555555", "Available", "Tablet", "Model E", "MasterAgentE", "DistributorE", "RetailerE", new Date(), employee));
+
+        // When GET request is made to fetch all phones with pagination
+        mockMvc.perform(get("/inventory?page=0&size=2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                // Then a page of phones is returned successfully
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").isNumber())
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.totalElements").isNumber());
     }
 }
