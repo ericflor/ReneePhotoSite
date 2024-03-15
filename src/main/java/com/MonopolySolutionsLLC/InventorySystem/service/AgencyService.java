@@ -2,7 +2,7 @@ package com.MonopolySolutionsLLC.InventorySystem.service;
 
 import com.MonopolySolutionsLLC.InventorySystem.exception.ResourceNotFoundException;
 import com.MonopolySolutionsLLC.InventorySystem.model.Agency;
-import com.MonopolySolutionsLLC.InventorySystem.model.UserRole;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.UserRole;
 import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

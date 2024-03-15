@@ -1,7 +1,7 @@
 package com.MonopolySolutionsLLC.InventorySystem.security;
 
 import com.MonopolySolutionsLLC.InventorySystem.model.Agency;
-import com.MonopolySolutionsLLC.InventorySystem.model.UserRole;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.UserRole;
 import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

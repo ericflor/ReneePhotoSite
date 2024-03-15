@@ -1,5 +1,6 @@
 package com.MonopolySolutionsLLC.InventorySystem.model;
 
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.Status;
 import lombok.*;
 
 import javax.persistence.*;

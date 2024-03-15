@@ -1,5 +1,7 @@
 package com.MonopolySolutionsLLC.InventorySystem.model;
 
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.AgencyLevel;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.UserRole;
 import lombok.*;
 
 import javax.persistence.*;

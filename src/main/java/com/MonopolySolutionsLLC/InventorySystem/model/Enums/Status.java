@@ -1,4 +1,4 @@
-package com.MonopolySolutionsLLC.InventorySystem.model;
+package com.MonopolySolutionsLLC.InventorySystem.model.Enums;
 
 public enum Status {
     NEW,

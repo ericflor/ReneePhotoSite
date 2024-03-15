@@ -1,9 +1,9 @@
 package com.MonopolySolutionsLLC.InventorySystem.integration;
 
 import com.MonopolySolutionsLLC.InventorySystem.model.Agency;
-import com.MonopolySolutionsLLC.InventorySystem.model.AgencyLevel;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.AgencyLevel;
 import com.MonopolySolutionsLLC.InventorySystem.model.DTOs.LoginRequest;
-import com.MonopolySolutionsLLC.InventorySystem.model.UserRole;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.UserRole;
 import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
