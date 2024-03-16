@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AgencyService {
@@ -41,6 +42,25 @@ public class AgencyService {
         }
 
         return agencyRepository.save(agency);
+    }
+
+    public List<Agency> saveMultipleAgencies(List<Agency> agencies) {
+        // Encode passwords and set roles before saving
+        List<Agency> processedAgencies = agencies.stream().map(agency -> {
+            agency.setPassword(passwordEncoder.encode(agency.getPassword()));
+            if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
+                agency.setRole(UserRole.EMPLOYEE);
+            } else {
+                agency.setRole(UserRole.ADMIN);
+            }
+            Agency existingAgency = agencyRepository.findByUsername(agency.getUsername());
+            if (existingAgency != null) {
+                throw new RuntimeException("The username: " + agency.getUsername() + " already exists.");
+            }
+            return agency;
+        }).collect(Collectors.toList());
+
+        return agencyRepository.saveAll(processedAgencies);
     }
 
     public Page<Agency> getAllAgencies(Pageable pageable) {

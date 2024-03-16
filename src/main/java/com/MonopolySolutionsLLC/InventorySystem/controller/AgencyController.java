@@ -42,6 +42,17 @@ public class AgencyController {
         return ResponseEntity.ok(agencyService.saveAgency(agency));
     }
 
+    @PostMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Agency>> addMultipleAgencies(@RequestBody List<Agency> agencies) {
+        if (agencies == null || agencies.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<Agency> savedAgencies = agencyService.saveMultipleAgencies(agencies);
+        return ResponseEntity.ok(savedAgencies);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Agency>> getAllAgencies(@PageableDefault() Pageable pageable) {
