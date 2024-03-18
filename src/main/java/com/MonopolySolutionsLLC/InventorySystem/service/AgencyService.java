@@ -75,6 +75,10 @@ public class AgencyService {
     public Agency updateAgency(Long id, Agency agencyDetails) throws ResourceNotFoundException {
         Agency agency = getAgencyById(id);
 
+        if (agency.getUsername().equalsIgnoreCase(agencyDetails.getUsername())) {
+            throw new RuntimeException("The username: " + agency.getUsername() + " already exists.");
+        }
+
         if (agencyDetails.getName() != null) agency.setName(agencyDetails.getName());
         if (agencyDetails.getEmail() != null) agency.setEmail(agencyDetails.getEmail());
         if (agencyDetails.getUsername() != null) agency.setUsername(agencyDetails.getUsername());
@@ -87,12 +91,6 @@ public class AgencyService {
             } else {
                 agency.setRole(UserRole.ADMIN);
             }
-        }
-
-        Agency existingAgency = agencyRepository.findByUsername(agency.getUsername());
-
-        if (existingAgency != null) {
-            throw new RuntimeException("The username: " + agency.getUsername() + " already exists.");
         }
 
         return agencyRepository.save(agency);
