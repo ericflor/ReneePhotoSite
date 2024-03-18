@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -62,7 +64,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testUpdateOrderStatus() throws Exception {
         // Create an order to update
-        Order order = new Order(null, "Test Inc", "Jane Doe", "0987654321", "jane.doe@example.com", "456 Elm St", "Yettown", "Yesstate", "54321", "ETC", 5, "Urgent", "12345", Status.NEW);
+        Order order = new Order(null, "Test Inc", "Jane Doe", "0987654321", "jane.doe@example.com", "456 Elm St", "Yettown", "Yesstate", "54321", "ETC", 5, "Urgent", "12345", new Date(), Status.NEW);
         Order savedOrder = ordersRepository.save(order);
 
         String updatedOrderJson = "{\"status\":\"APPROVED\"}";
@@ -78,7 +80,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testDeleteOrder() throws Exception {
         // Create an order to delete
-        Order order = new Order(null, "Delete Me Inc", "Doomed User", "1231231234", "doomed@example.com", "789 Doom St", "Doomtown", "Doomstate", "66666", "DOOM", 666, "Very Urgent", "666", Status.NEW);
+        Order order = new Order(null, "Delete Me Inc", "Doomed User", "1231231234", "doomed@example.com", "789 Doom St", "Doomtown", "Doomstate", "66666", "DOOM", 666, "Very Urgent", "666", new Date(), Status.NEW);
         Order savedOrder = ordersRepository.save(order);
 
         mockMvc.perform(delete("/orders/" + savedOrder.getId()))
@@ -102,7 +104,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testGetOrderById() throws Exception {
         // Create an order to fetch
-        Order order = new Order(null, "Fetch Me Inc", "Fetchy User", "3213214321", "fetchy@example.com", "321 Fetch St", "Fetchtown", "Fetchstate", "33333", "FETCH", 333, "Mildly Urgent", "333", Status.NEW);
+        Order order = new Order(null, "Fetch Me Inc", "Fetchy User", "3213214321", "fetchy@example.com", "321 Fetch St", "Fetchtown", "Fetchstate", "33333", "FETCH", 333, "Mildly Urgent", "333", new Date(), Status.NEW);
         Order savedOrder = ordersRepository.save(order);
 
         mockMvc.perform(get("/orders/" + savedOrder.getId()).contentType(MediaType.APPLICATION_JSON))
@@ -190,7 +192,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testUpdateOrderToShipped() throws Exception {
         // Create an order
-        Order order = new Order(null, "Company Name", "John Doe", "123456789", "john.doe@example.com", "123 Main St", "City", "State", "12345", null, 10, null, null, Status.APPROVED);
+        Order order = new Order(null, "Company Name", "John Doe", "123456789", "john.doe@example.com", "123 Main St", "City", "State", "12345", null, 10, null, null, new Date(), Status.APPROVED);
         Order savedOrder = ordersRepository.save(order);
 
         // Update the order status to SHIPPED
@@ -205,7 +207,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testUpdateOrderToDenied() throws Exception {
         // Create an order
-        Order order = new Order(null, "Company Name", "Jane Doe", "987654321", "jane.doe@example.com", "456 Another St", "Another City", "Another State", "54321", null, 5, null, null, Status.NEW);
+        Order order = new Order(null, "Company Name", "Jane Doe", "987654321", "jane.doe@example.com", "456 Another St", "Another City", "Another State", "54321", null, 5, null, null, new Date(), Status.NEW);
         Order savedOrder = ordersRepository.save(order);
 
         // Update the order status to DENIED
@@ -220,7 +222,7 @@ public class OrdersControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testGetOrderByIdSuccess() throws Exception {
         // Create and save an order
-        Order newOrder = new Order(null, "Test Company", "John Smith", "555-555-5555", "john@test.com", "123 Test Ave", "Test City", "TS", "12345", "Test Order", 1, "No notes", null, Status.NEW);
+        Order newOrder = new Order(null, "Test Company", "John Smith", "555-555-5555", "john@test.com", "123 Test Ave", "Test City", "TS", "12345", "Test Order", 1, "No notes", null, new Date(), Status.NEW);
         Order savedOrder = ordersRepository.save(newOrder);
 
         // Perform the GET request

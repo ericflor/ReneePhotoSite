@@ -4,6 +4,7 @@ import com.MonopolySolutionsLLC.InventorySystem.model.Enums.Status;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -30,6 +31,7 @@ public class Order {
     private Integer quantity;
     private String notes;
     private String trackingNumber;
+    private Date date;
 
     @Enumerated(EnumType.STRING)
     private Status status;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,17 @@ public class OrdersService {
 
 
     public Order saveOrder(Order order) {
+
+        order.setDate(new Date());
+
         return ordersRepository.save(order);
+    }
+
+    public List<Order> saveMultipleOrders(List<Order> orders) {
+
+        orders.forEach(order -> order.setDate(new Date()));
+
+        return ordersRepository.saveAll(orders);
     }
 
     public Page<Order> getAllOrders(Pageable pageable) {
@@ -61,9 +72,5 @@ public class OrdersService {
         if (orderDetails.getStatus() != null) order.setStatus(orderDetails.getStatus());
 
         return ordersRepository.save(order);
-    }
-
-    public List<Order> saveMultipleOrders(List<Order> orders) {
-        return ordersRepository.saveAll(orders);
     }
 }
