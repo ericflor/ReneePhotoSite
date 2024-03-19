@@ -21,28 +21,27 @@ public class InventoryController {
     @Autowired
     private InventoryService inventoryService;
 
-
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<Phone> addPhone(@RequestBody Phone phone) {
         return ResponseEntity.ok(inventoryService.savePhone(phone));
     }
 
     @PostMapping("/batch")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Phone>> addPhonesBatch(@RequestBody List<Phone> phones){
-        return  ResponseEntity.ok(inventoryService.savePhones(phones));
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
+    public ResponseEntity<List<Phone>> addPhonesBatch(@RequestBody List<Phone> phones) {
+        return ResponseEntity.ok(inventoryService.savePhones(phones));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public ResponseEntity<Page<Phone>> getAllPhones(@PageableDefault() Pageable pageable) {
         Page<Phone> phones = inventoryService.getAllPhones(pageable);
         return ResponseEntity.ok(phones);
     }
 
     @GetMapping("/{imei}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public ResponseEntity<Optional<Phone>> getPhoneByIMEI(@PathVariable String imei) {
         try {
             return ResponseEntity.ok(inventoryService.getPhoneByImei(imei));
@@ -52,7 +51,7 @@ public class InventoryController {
     }
 
     @PatchMapping("/{imei}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<Phone> updatePhone(@PathVariable String imei, @RequestBody Phone phoneDetails) {
         try {
             Phone updatedPhone = inventoryService.updatePhone(imei, phoneDetails);

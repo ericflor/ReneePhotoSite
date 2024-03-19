@@ -24,7 +24,7 @@ public class AgencyController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<?> createAgency(@RequestBody Agency agency) {
 
         if (agency.getLevel() == null) {
@@ -43,7 +43,7 @@ public class AgencyController {
     }
 
     @PostMapping("/batch")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<List<Agency>> addMultipleAgencies(@RequestBody List<Agency> agencies) {
         if (agencies == null || agencies.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
@@ -54,14 +54,14 @@ public class AgencyController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public ResponseEntity<Page<Agency>> getAllAgencies(@PageableDefault() Pageable pageable) {
         Page<Agency> agencies = agencyService.getAllAgencies(pageable);
         return ResponseEntity.ok(agencies);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public ResponseEntity<Agency> getAgencyById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(agencyService.getAgencyById(id));
@@ -71,7 +71,7 @@ public class AgencyController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<Agency> updateAgency(@PathVariable Long id, @RequestBody Agency agencyDetails) {
         try {
             return ResponseEntity.ok(agencyService.updateAgency(id, agencyDetails));

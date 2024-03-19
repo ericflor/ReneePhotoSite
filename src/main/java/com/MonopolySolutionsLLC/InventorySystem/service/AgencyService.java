@@ -50,7 +50,14 @@ public class AgencyService {
             agency.setPassword(passwordEncoder.encode(agency.getPassword()));
             if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
                 agency.setRole(UserRole.EMPLOYEE);
-            } else {
+            }
+            else if ("distributor".equalsIgnoreCase(agency.getLevel().name())){
+                agency.setRole(UserRole.DISTRIBUTOR);
+            }
+            else if ("retailer".equalsIgnoreCase(agency.getLevel().name())){
+                agency.setRole(UserRole.RETAILER);
+            }
+            else {
                 agency.setRole(UserRole.ADMIN);
             }
             Agency existingAgency = agencyRepository.findByUsername(agency.getUsername());

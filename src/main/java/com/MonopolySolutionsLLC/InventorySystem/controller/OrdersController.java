@@ -23,20 +23,20 @@ public class OrdersController {
 
 
     @PostMapping("/bulk")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<List<Order>> addMultipleOrders(@RequestBody List<Order> orders) {
         List<Order> savedOrders = ordersService.saveMultipleOrders(orders);
         return ResponseEntity.ok(savedOrders);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public Order addOrder(@RequestBody Order order) {
         return ordersService.saveOrder(order);
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
     public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
         try {
             Order updatedOrder = ordersService.updateOrder(id, orderDetails);
@@ -53,13 +53,14 @@ public class OrdersController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public ResponseEntity<Page<Order>> getAllOrders(@PageableDefault() Pageable pageable) {
         Page<Order> orders = ordersService.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER', 'EMPLOYEE')")
     public Optional<Order> getOrderById(@PathVariable Long id) {
         return ordersService.getOrderById(id);
     }
