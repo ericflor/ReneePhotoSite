@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +62,21 @@ public class InventoryController {
         }
     }
 
+    @PatchMapping("/batch")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DISTRIBUTOR', 'RETAILER')")
+    public ResponseEntity<List<Phone>> updatePhonesBatch(@RequestBody List<Phone> phones) {
+        List<Phone> updatedPhones = new ArrayList<>();
+        for (Phone phone : phones) {
+            try {
+                Phone updatedPhone = inventoryService.updatePhone(phone.getImei(), phone);
+                updatedPhones.add(updatedPhone);
+            } catch (ResourceNotFoundException e) {
+                return ResponseEntity.notFound().build();
+            }
+        }
+        return ResponseEntity.ok(updatedPhones);
+    }
+
     @DeleteMapping("/{imei}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deletePhone(@PathVariable String imei) {
@@ -71,4 +87,5 @@ public class InventoryController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
