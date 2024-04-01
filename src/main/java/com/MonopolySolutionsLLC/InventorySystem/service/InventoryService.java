@@ -6,13 +6,12 @@ import com.MonopolySolutionsLLC.InventorySystem.model.Phone;
 import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import com.MonopolySolutionsLLC.InventorySystem.repo.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -28,6 +27,7 @@ public class InventoryService {
 
     @Autowired
     private AgencyRepository agencyRepository;
+
 
 
     public Phone savePhone(Phone phone) {
@@ -49,11 +49,17 @@ public class InventoryService {
     }
 
     @Transactional
-    public void deletePhone(String imei) {
+    public void deletePhone(String imei) throws ResourceNotFoundException {
+        boolean exists = inventoryRepository.existsByImei(imei);
+        if (!exists) {
+            throw new ResourceNotFoundException("Phone not found for this imei: " + imei);
+        }
         inventoryRepository.deleteByImei(imei);
     }
 
+
     public Phone updatePhone(String imei, Phone phoneDetails) {
+
         Phone phone = inventoryRepository.findByImei(imei)
                 .orElseThrow(() -> new ResourceNotFoundException("Phone not found for this imei: " + imei));
 
@@ -64,6 +70,7 @@ public class InventoryService {
         if (currentUserAgency == null) {
             throw new EntityNotFoundException("Current user not found");
         }
+
         // Logic to determine if the current user can perform the update based on their role
         boolean isUpdateAllowed = false;
 
@@ -111,4 +118,5 @@ public class InventoryService {
 
         return inventoryRepository.save(phone);
     }
+
 }

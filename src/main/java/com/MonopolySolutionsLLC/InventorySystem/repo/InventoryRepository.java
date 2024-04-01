@@ -11,6 +11,8 @@ public interface InventoryRepository extends JpaRepository<Phone, String> {
 
     Optional<Phone> findByImei(String imei);
 
+    boolean existsByImei(String imei);
+
     void deleteByImei(String imei);
 
 }

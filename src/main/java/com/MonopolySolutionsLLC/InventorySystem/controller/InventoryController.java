@@ -87,5 +87,4 @@ public class InventoryController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
