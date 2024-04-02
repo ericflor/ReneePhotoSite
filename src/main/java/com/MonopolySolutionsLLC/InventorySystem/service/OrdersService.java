@@ -2,6 +2,7 @@ package com.MonopolySolutionsLLC.InventorySystem.service;
 
 import com.MonopolySolutionsLLC.InventorySystem.model.Order;
 import com.MonopolySolutionsLLC.InventorySystem.exception.ResourceNotFoundException;
+import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import com.MonopolySolutionsLLC.InventorySystem.repo.OrdersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class OrdersService {
 
     @Autowired
     private OrdersRepository ordersRepository;
+
+    @Autowired
+    private AgencyRepository agencyRepository;
 
 
 

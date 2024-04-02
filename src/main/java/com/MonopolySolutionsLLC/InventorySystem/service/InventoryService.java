@@ -3,6 +3,7 @@ package com.MonopolySolutionsLLC.InventorySystem.service;
 import com.MonopolySolutionsLLC.InventorySystem.exception.ResourceNotFoundException;
 import com.MonopolySolutionsLLC.InventorySystem.model.Agency;
 import com.MonopolySolutionsLLC.InventorySystem.model.DTOs.UpdatePhoneResponse;
+import com.MonopolySolutionsLLC.InventorySystem.model.Enums.UserRole;
 import com.MonopolySolutionsLLC.InventorySystem.model.Phone;
 import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import com.MonopolySolutionsLLC.InventorySystem.repo.InventoryRepository;
@@ -42,11 +43,33 @@ public class InventoryService {
     }
 
     public Page<Phone> getAllPhones(Pageable pageable) {
-        return inventoryRepository.findAll(pageable);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<Agency> agencyOptional = Optional.ofNullable(agencyRepository.findByUsername(username));
+
+        // Check the user's role to determine the appropriate data access strategy
+        if (agencyOptional.isPresent() && agencyOptional.get().getRole().equals(UserRole.ADMIN)) {
+            // ADMIN sees everything
+            return inventoryRepository.findAll(pageable);
+        } else {
+            // Other roles see only their associated records
+            return inventoryRepository.findByEmployee_Username(username, pageable);
+        }
     }
 
     public Optional<Phone> getPhoneByImei(String imei) {
-        return inventoryRepository.findByImei(imei);
+        // Adjust to fetch based on user's role and association
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Agency currentUserAgency = agencyRepository.findByUsername(username);
+
+        if (currentUserAgency.getRole().equals(UserRole.ADMIN)) {
+            // ADMIN can access any phone
+            return inventoryRepository.findByImei(imei);
+        } else {
+            // Other roles can access only their phones
+            return inventoryRepository.findByImeiAndEmployee_Username(imei, username);
+        }
     }
 
     @Transactional
@@ -58,10 +81,9 @@ public class InventoryService {
         inventoryRepository.deleteByImei(imei);
     }
 
-
     public UpdatePhoneResponse updatePhone(String imei, Phone phoneDetails) {
 
-        try{
+        try {
                 Phone phone = inventoryRepository.findByImei(imei)
                         .orElseThrow(() -> new ResourceNotFoundException("Phone not found for this imei: " + imei));
 

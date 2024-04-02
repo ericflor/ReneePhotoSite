@@ -3,6 +3,7 @@ package com.MonopolySolutionsLLC.InventorySystem.service;
 import com.MonopolySolutionsLLC.InventorySystem.exception.CustomDatabaseException;
 import com.MonopolySolutionsLLC.InventorySystem.model.BatchAssign;
 import com.MonopolySolutionsLLC.InventorySystem.model.BatchAssignDetail;
+import com.MonopolySolutionsLLC.InventorySystem.repo.AgencyRepository;
 import com.MonopolySolutionsLLC.InventorySystem.repo.BatchAssignRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +23,9 @@ public class BatchAssignService {
 
     @Autowired
     private BatchAssignRepository batchAssignRepository;
+
+    @Autowired
+    private AgencyRepository agencyRepository;
 
 
     public BatchAssign createBatchAssign(BatchAssign batchAssign, List<String> imeis, List<Boolean> outcomes) {
