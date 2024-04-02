@@ -32,10 +32,15 @@ public class AgencyService {
 
         // Check if the level is 'employee', ignoring case
         if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
-            // If true, set the role of the agency to EMPLOYEE
             agency.setRole(UserRole.EMPLOYEE);
-            // Else, set the role of the agency to ADMIN
-        } else {
+        }
+        else if ("distributor".equalsIgnoreCase(agency.getLevel().name())){
+            agency.setRole(UserRole.DISTRIBUTOR);
+        }
+        else if ("retailer".equalsIgnoreCase(agency.getLevel().name())){
+            agency.setRole(UserRole.RETAILER);
+        }
+        else {
             agency.setRole(UserRole.ADMIN);
         }
 
