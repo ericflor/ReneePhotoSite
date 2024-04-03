@@ -31,5 +31,5 @@ public class BatchAssign {
 //    @Builder.Default
     @OneToMany(mappedBy = "batchAssign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<BatchAssignDetail> details = new ArrayList<>();
+    private final List<BatchAssignDetail> details = new ArrayList<>();
 }
