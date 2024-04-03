@@ -6,23 +6,10 @@ plugins {
 
 group = 'com.MonopolySolutionsLLC'
 version = '0.0.1-SNAPSHOT'
-
-java {
-	sourceCompatibility = '17'
-}
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
+sourceCompatibility = '17'
 
 repositories {
 	mavenCentral()
-}
-
-tasks.withType(JavaCompile) {
-	options.compilerArgs << "-Xlint:deprecation"
 }
 
 
@@ -44,6 +31,13 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
+
+bootJar {
+	manifest {
+		attributes 'Main-Class': 'com.MonopolySolutionsLLC.InventorySystem.PhoneInventoryApplication'
+	}
+}
+
 
 tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
