@@ -31,7 +31,6 @@ public class AgencyController {
             return ResponseEntity.badRequest().body("Error: Level is required.");
         }
 
-        // Check if the provided level string matches any AgencyLevel enum, case-insensitively
         boolean levelExists = Arrays.stream(AgencyLevel.values())
                 .anyMatch(e -> e.name().equalsIgnoreCase(agency.getLevel().name()));
 

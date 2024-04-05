@@ -47,7 +47,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         logger.error("HttpMessageNotReadableException: {}", ex.getMessage());
-        // Optionally, you can inspect the cause of the HttpMessageNotReadableException to provide a more specific message
         Throwable mostSpecificCause = ex.getMostSpecificCause();
         String errorMessage;
         String exceptionName = mostSpecificCause.getClass().getName();

@@ -13,13 +13,13 @@ public class UserPrincipal implements UserDetails {
     private final Long id;
     private final String username;
     private final String password;
-    private final String role; // Store the role
+    private final String role;
 
     public UserPrincipal(Agency user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.role = String.valueOf(user.getRole()); // Initialize role
+        this.role = String.valueOf(user.getRole());
     }
 
     @Override
@@ -37,25 +37,24 @@ public class UserPrincipal implements UserDetails {
         return username;
     }
 
-    // Ensure these methods return true if the account is in good standing
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Update as necessary
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Update as necessary
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Update as necessary
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Update as necessary
+        return true;
     }
 
     public Long getId() {

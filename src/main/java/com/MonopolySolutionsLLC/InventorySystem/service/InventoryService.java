@@ -47,27 +47,21 @@ public class InventoryService {
         String username = authentication.getName();
         Optional<Agency> agencyOptional = Optional.ofNullable(agencyRepository.findByUsername(username));
 
-        // Check the user's role to determine the appropriate data access strategy
         if (agencyOptional.isPresent() && agencyOptional.get().getRole().equals(UserRole.ADMIN)) {
-            // ADMIN sees everything
             return inventoryRepository.findAll(pageable);
         } else {
-            // Other roles see only their associated records
             return inventoryRepository.findByEmployee_Username(username, pageable);
         }
     }
 
     public Optional<Phone> getPhoneByImei(String imei) {
-        // Adjust to fetch based on user's role and association
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Agency currentUserAgency = agencyRepository.findByUsername(username);
 
         if (currentUserAgency.getRole().equals(UserRole.ADMIN)) {
-            // ADMIN can access any phone
             return inventoryRepository.findByImei(imei);
         } else {
-            // Other roles can access only their phones
             return inventoryRepository.findByImeiAndEmployee_Username(imei, username);
         }
     }
@@ -87,7 +81,6 @@ public class InventoryService {
                 Phone phone = inventoryRepository.findByImei(imei)
                         .orElseThrow(() -> new ResourceNotFoundException("Phone not found for this imei: " + imei));
 
-                // Fetch the current user's agency information based on username
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 String username = authentication.getName();
                 Agency currentUserAgency = agencyRepository.findByUsername(username);
@@ -95,7 +88,6 @@ public class InventoryService {
                     throw new EntityNotFoundException("Current user not found");
                 }
 
-                // Logic to determine if the current user can perform the update based on their role
                 boolean isUpdateAllowed = false;
 
                 switch (currentUserAgency.getRole()) {
@@ -116,7 +108,7 @@ public class InventoryService {
                         }
                         break;
                     case EMPLOYEE:
-                        // EMPLOYEE can't use the system for transferring
+                        // EMPLOYEE can't use the system
                         isUpdateAllowed = false;
                         break;
                 }
@@ -125,7 +117,6 @@ public class InventoryService {
                     throw new AccessDeniedException("You do not have permission to perform this action.");
                 }
 
-                // Update fields if they are not null
                 if (phoneDetails.getStatus() != null) phone.setStatus(phoneDetails.getStatus());
                 if (phoneDetails.getType() != null) phone.setType(phoneDetails.getType());
                 if (phoneDetails.getModel() != null) phone.setModel(phoneDetails.getModel());
@@ -133,7 +124,6 @@ public class InventoryService {
                 if (phoneDetails.getDistributor() != null) phone.setDistributor(phoneDetails.getDistributor());
                 if (phoneDetails.getRetailer() != null) phone.setRetailer(phoneDetails.getRetailer());
                 if (phoneDetails.getDate() != null) phone.setDate(phoneDetails.getDate());
-
 
                 if (phoneDetails.getEmployee() != null && phoneDetails.getEmployee().getId() != null) {
                     Agency existingAgency = agencyRepository.findById(phoneDetails.getEmployee().getId()).orElseThrow(() -> new EntityNotFoundException("Agency not found"));

@@ -28,7 +28,6 @@ public class BatchAssign {
     private int uploadedSuccess;
     private int uploadedFailure;
 
-//    @Builder.Default
     @OneToMany(mappedBy = "batchAssign", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private final List<BatchAssignDetail> details = new ArrayList<>();

@@ -26,11 +26,11 @@ public class AgencyService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
     public Agency saveAgency(Agency agency) {
 
         agency.setPassword(passwordEncoder.encode(agency.getPassword()));
 
-        // Check if the level is 'employee', ignoring case
         if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
             agency.setRole(UserRole.EMPLOYEE);
         }
@@ -54,7 +54,6 @@ public class AgencyService {
     }
 
     public List<Agency> saveMultipleAgencies(List<Agency> agencies) {
-        // Encode passwords and set roles before saving
         List<Agency> processedAgencies = agencies.stream().map(agency -> {
             agency.setPassword(passwordEncoder.encode(agency.getPassword()));
             if ("employee".equalsIgnoreCase(agency.getLevel().name())) {
@@ -86,17 +85,13 @@ public class AgencyService {
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin) {
-            // Admins can view all agencies
             return agencyRepository.findAll(pageable);
         } else {
-            // Non-admin users can only view their own agency information
             Agency agency = agencyRepository.findByUsername(currentUsername);
             if (agency != null) {
-                // Simulate a pageable response with just one agency
                 List<Agency> agencies = List.of(agency);
                 return new PageImpl<>(agencies, pageable, agencies.size());
             } else {
-                // If no matching agency is found, return an empty page
                 return Page.empty(pageable);
             }
         }
@@ -112,10 +107,8 @@ public class AgencyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Agency not found with ID: " + id));
 
         if (isAdmin || agency.getUsername().equals(currentUsername)) {
-            // Admins can view any agency, and users can view their own agency
             return agency;
         } else {
-            // Non-admin users trying to view another user's agency are denied
             throw new AccessDeniedException("Access is denied");
         }
     }
@@ -143,7 +136,6 @@ public class AgencyService {
 
         return agencyRepository.save(agency);
     }
-
 
     public void deleteAgency(Long id) {
         agencyRepository.deleteById(id);

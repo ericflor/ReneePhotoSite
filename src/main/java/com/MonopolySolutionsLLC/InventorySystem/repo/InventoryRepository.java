@@ -17,7 +17,6 @@ public interface InventoryRepository extends JpaRepository<Phone, String> {
 
     void deleteByImei(String imei);
 
-    // New Methods leveraging the relationship between Phone and Agency
     Page<Phone> findByEmployee_Username(String username, Pageable pageable);
     Optional<Phone> findByImeiAndEmployee_Username(String imei, String username);
 

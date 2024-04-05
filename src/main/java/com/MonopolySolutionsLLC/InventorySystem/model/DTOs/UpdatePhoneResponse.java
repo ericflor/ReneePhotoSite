@@ -7,14 +7,12 @@ public class UpdatePhoneResponse {
     private Phone phone;
     private String message;
 
-    // Constructors, Getters, and Setters
     public UpdatePhoneResponse(boolean success, Phone phone, String message) {
         this.success = success;
         this.phone = phone;
         this.message = message;
     }
 
-    // getters and setters
     public boolean isSuccess() {
         return success;
     }

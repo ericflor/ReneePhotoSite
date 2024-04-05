@@ -60,7 +60,6 @@ public class OrdersService {
         Order order = ordersRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with ID " + id + " not found"));
 
-        // Only update fields that are present in the request
         if (orderDetails.getCompanyName() != null) order.setCompanyName(orderDetails.getCompanyName());
         if (orderDetails.getNameOfRecipient() != null) order.setNameOfRecipient(orderDetails.getNameOfRecipient());
         if (orderDetails.getPhoneNumber() != null) order.setPhoneNumber(orderDetails.getPhoneNumber());
