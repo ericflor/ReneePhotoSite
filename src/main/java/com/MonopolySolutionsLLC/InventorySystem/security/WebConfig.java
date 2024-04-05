@@ -9,11 +9,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Allow all paths
-                .allowedOrigins("http://localhost:4200") // Allow specific origins (your Angular app's URL)
-                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS") // Allow specific HTTP methods
-                .allowedHeaders("*") // Allow all headers
-                .allowCredentials(true); // Allow credentials
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:4200", // Local development
+                        "https://monopoly-solutions-llc-ui-e750baef0a6c.herokuapp.com" // Production
+                )
+                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
 
